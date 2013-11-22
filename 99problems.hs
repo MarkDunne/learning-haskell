@@ -1,4 +1,6 @@
 import Data.List
+import System.Random
+import Control.Monad
 
 --Problem 3
 elementAt :: Eq a => [a] -> Integer -> a
@@ -98,7 +100,7 @@ split :: [a] -> Int -> ([a], [a])
 split (x:xs) n
     | n > 1 = (x: before, after)
     | otherwise = ([x], xs)
-        where (before, after) = split xs (n-1)
+        where (before, after) = Main.split xs (n-1)
 
 --Problem 18
 slice :: [a] -> Int -> Int -> [a]
@@ -134,6 +136,22 @@ range :: Enum a => a -> a -> [a]
 range start end = [start..end]
 
 --Problem 23
+rndElem :: [a] -> IO a
+rndElem xs = do
+    n <- randomRIO(0, length xs - 1)
+    return $ xs !! n
 
+rndSelect :: [a] -> Int -> IO [a]
+rndSelect xs n = replicateM n (rndElem xs)
 
-main = print $ range 4 7
+--Problem 24
+rndDistinctElems :: [a] -> Int -> IO [a]
+rndDistinctElems xs n = do
+    gen <- getStdGen
+    let indicies = take n . nub $ randomRs (0, length xs - 1) gen
+    return [xs!!i | i <- indicies]
+
+diffSelect :: Int -> Int -> IO [Int]
+diffSelect n m = rndDistinctElems [1..m] n
+
+main = diffSelect 6 49
