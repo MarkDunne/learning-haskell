@@ -59,8 +59,6 @@ powers n = map (n^) [1..]
 factorials :: [Integer]
 factorials = [foldl1 (*) [1..n] | n <- [1..]]
 
-main = print $ take 7 (powers 2)
-
 --Assignment 4
 --Q1
 approx n = iterate (\x -> (x + n / x) / 2) 1
@@ -71,4 +69,8 @@ approxRoot n = snd . head $ dropWhile cond (zip list (tail list))
           cond (a, b) = abs(a - b) > 0.0001          
 
 --Q3
-primes =   2 : [p | p <- [3,5..], all (\n -> gcd n p == 1) (takeWhile (\n -> n*n <= p) [2..])]
+primes = 2 : [p | p <- [3,5..], all (relativelyPrime p) (candidateDivisors p)]
+    where relativelyPrime p n = gcd p n == 1
+          candidateDivisors p = takeWhile (\n -> n*n <= p) primes
+
+main = print $ take 1000 primes
