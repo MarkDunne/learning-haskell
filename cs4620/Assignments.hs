@@ -69,8 +69,8 @@ approxRoot n = snd . head $ dropWhile cond (zip list (tail list))
           cond (a, b) = abs(a - b) > 0.0001          
 
 --Q3
-primes = 2 : [p | p <- [3,5..], all (relativelyPrime p) (candidateDivisors p)]
-    where relativelyPrime p n = gcd p n == 1
+primes = 2 : 3 : [x+i | x <- [6,12..], i <- [-1, 1], all (divides $ x+i) (candidateDivisors $ x+i)]
+    where divides p n = not $ mod p n == 0
           candidateDivisors p = takeWhile (\n -> n*n <= p) primes
 
 main = print $ take 1000 primes

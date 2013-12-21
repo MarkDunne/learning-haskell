@@ -146,12 +146,74 @@ rndSelect xs n = replicateM n (rndElem xs)
 
 --Problem 24
 rndDistinctElems :: [a] -> Int -> IO [a]
+rndDistinctElems __ 0 = return []
 rndDistinctElems xs n = do
     gen <- getStdGen
-    let indicies = take n . nub $ randomRs (0, length xs - 1) gen
-    return [xs!!i | i <- indicies]
+    rand <- randomRIO(1, length xs)
+    let (elem, remaining) = removeAt rand xs
+    rest <- rndDistinctElems remaining (n-1)
+    return $ elem : rest
 
 diffSelect :: Int -> Int -> IO [Int]
 diffSelect n m = rndDistinctElems [1..m] n
 
-main = diffSelect 6 49
+--Problem 25
+rnd_permu :: [a] -> IO [a]
+rnd_permu xs = rndDistinctElems xs (length xs)
+
+--Problem 26
+combinations :: [a] -> Int -> [[a]]
+combinations __ 0      = [[]]
+combinations [] _     = []
+combinations (x:xs) m = map (x:) (combinations xs (m-1)) ++ combinations xs m
+
+--Problem 27
+
+--Problem 28
+lsort :: [[a]] -> [[a]]
+lsort xs = sortBy f xs
+    where f a b = compare (length a) (length b) 
+
+fsort :: [[a]] -> [[a]]
+fsort xs = concat . lsort $ groupBy f (lsort xs)
+    where f a b = (length a) == (length b)
+
+--Problem 31
+primes :: [Int]
+primes = 2 : 3 : [x+i | x <- [6,12..], i <- [-1, 1], all (relativelyPrime $ x+i) (candidateDivisors $ x+i)]
+    where relativelyPrime p n = not $ p `mod` n == 0
+          candidateDivisors p = takeWhile (\n -> n*n <= p) primes
+
+isPrime :: Int -> Bool
+isPrime n = any ((/=0) . mod n ) (takeWhile (\p -> p*p<=n) primes)
+
+--Problem 32
+myGcd :: Int -> Int -> Int 
+myGcd a 0 = a
+myGcd a b = myGcd b (a `mod` b)
+
+--Problem 33
+coprime :: Int -> Int -> Bool
+coprime a b = (myGcd a b) == 1
+
+--Problem 34
+totient :: Int -> Int
+totient x = length [n | n <- [1..x], coprime x n]
+
+--Problem 35
+primeFactors :: Int -> [Int]
+primeFactors n = go primes n
+    where go primes@(p:ps) n
+            | n `mod` p == 0 = p : go primes (n `div` p)
+            | p > n = []
+            | otherwise = go ps n
+
+--Problem 36
+primeFactorsMult :: Int -> [(Int, Int)]
+primeFactorsMult n = encode $ primeFactors n
+
+--Problem 37
+phi :: Int -> Int
+phi n = product [(p - 1) * p ^ (m - 1) | (m, p) <- primeFactorsMult n]
+
+main = print $ phi 10090
