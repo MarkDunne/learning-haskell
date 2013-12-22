@@ -1,6 +1,8 @@
 import Data.List
 import System.Random
 import Control.Monad
+import Data.Function
+import Data.Time.Calendar
 
 --Problem 3
 elementAt :: Eq a => [a] -> Integer -> a
@@ -216,4 +218,19 @@ primeFactorsMult n = encode $ primeFactors n
 phi :: Int -> Int
 phi n = product [(p - 1) * p ^ (m - 1) | (m, p) <- primeFactorsMult n]
 
-main = print $ phi 10090
+--problem = maximumBy (compare `on` numValidDivisors) [1..100]
+--    where divisors x = 
+--          numValidDivisors x = (length $ divisors x) - 2 * (length $ filter (<=12) (divisors x))
+
+
+--Problem
+
+
+problem = maximumBy (compare `on` numValidDates) [1..100]
+    where divisorPairs n = [(d, n `div` d) | d <- [1..n], n `mod` d == 0]
+          numValidDates year = length $ filter (validDate (toInteger year)) (divisorPairs year)
+          validDate year (day, month) = day <= (gregorianMonthLength year month) && month <= 12
+          
+
+main = do
+    print problem
