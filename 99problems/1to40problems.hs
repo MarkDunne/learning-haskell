@@ -1,8 +1,8 @@
+import Debug.Trace
 import Data.List
 import System.Random
 import Control.Monad
 import Data.Function
-import Data.Time.Calendar
 
 --Problem 3
 elementAt :: Eq a => [a] -> Integer -> a
@@ -218,19 +218,20 @@ primeFactorsMult n = encode $ primeFactors n
 phi :: Int -> Int
 phi n = product [(p - 1) * p ^ (m - 1) | (m, p) <- primeFactorsMult n]
 
---problem = maximumBy (compare `on` numValidDivisors) [1..100]
---    where divisors x = 
---          numValidDivisors x = (length $ divisors x) - 2 * (length $ filter (<=12) (divisors x))
+--Problem 39
+primeR :: Int -> Int -> [Int]
+primeR lo hi = takeWhile (\p -> p < hi) $ dropWhile (\p -> p < lo) primes
 
+--Problem 40
+goldbach :: Int -> (Int, Int)
+goldbach n = head [(p1, p2) | p1 <- primeR 2 n, p2 <- primeR p1 (n-p1+1), p1 + p2 == n]
 
---Problem
+--Problem 41 Part 1
+goldbachList :: Int -> Int -> [(Int, Int)]
+goldbachList lo hi = map goldbach (filter even [lo..hi])
 
+--Problem 41 Part 2
+goldbachList' :: Int -> Int -> Int -> Int
+goldbachList' lo hi n = sum [1 | (a, b) <- goldbachList lo hi, a >= n || b >= n]
 
-problem = maximumBy (compare `on` numValidDates) [1..100]
-    where divisorPairs n = [(d, n `div` d) | d <- [1..n], n `mod` d == 0]
-          numValidDates year = length $ filter (validDate (toInteger year)) (divisorPairs year)
-          validDate year (day, month) = day <= (gregorianMonthLength year month) && month <= 12
-          
-
-main = do
-    print problem
+main = print $ goldbachList' 4 3000 50
