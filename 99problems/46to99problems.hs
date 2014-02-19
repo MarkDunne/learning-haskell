@@ -33,8 +33,6 @@ gray :: Int -> [[Int]]
 gray n = map binaryToGray (replicateM n [0, 1])
 
 --Problem 50
---huffman :: [(Char, Int)] -> [(Char, String)]
-
 data HTree a = Leaf a | Branch (HTree a) (HTree a)
 	deriving (Show)
 
