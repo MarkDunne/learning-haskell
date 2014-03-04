@@ -12,6 +12,10 @@ data Table a = Table {
     rows :: [Row a]
 } deriving (Show)
 
+numAttributes :: Table a -> Int
+numAttributes (Table rows) = numAttributesRow $ head rows
+  where numAttributesRow (Row attributes outcome) = length attributes 
+
 average :: (Num a, Fractional a) => [a] -> a
 average ls = sum ls / genericLength ls
 
@@ -29,10 +33,10 @@ splitColumn (Table rows) colNum = foldl f Map.empty rows
 columnEntropy :: Ord k => Table k -> Int -> Double
 columnEntropy table attributeCol = weightedAverage (Map.elems (splitColumn table attributeCol))
     where weightedAverage columns = (sum $ map weight columns) / (genericLength $ rows table)
-          weight column = (binaryEntropy column) * genericLength column
+          weight column = binaryEntropy column * genericLength column
 
 main = do
-    print $ [columnEntropy testData col | col <- [0..3]]
+  print $ maximumBy (comparing $ columnEntropy testData) [0.. numAttributes testData - 1]
 
 testData = Table [Row ["sunny", "hot", "high", "false"] False,
        Row ["sunny", "hot", "high", "true"] False,
