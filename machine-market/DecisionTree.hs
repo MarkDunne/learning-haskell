@@ -19,6 +19,9 @@ numAttributes (Table rows) = numAttributesRow $ head rows
 average :: (Num a, Fractional a) => [a] -> a
 average ls = sum ls / genericLength ls
 
+removeNth :: [a] -> Int -> [a]
+removeNth ls n = map (\(x, _) -> x) . filter (\(_, num) -> num /= n) $ zip ls [0..]
+
 binaryEntropy :: [Bool] -> Double
 binaryEntropy inputs = calc probTrue + calc (1 - probTrue)
     where probTrue = genericLength (filter id inputs) / genericLength inputs
@@ -35,20 +38,25 @@ columnEntropy table attributeCol = weightedAverage (Map.elems (splitColumn table
     where weightedAverage columns = (sum $ map weight columns) / (genericLength $ rows table)
           weight column = binaryEntropy column * genericLength column
 
+splitTable :: Ord k => Table k -> Int -> [Table k]
+splitTable (Table rows) colNum = map (\rows -> Table rows) . Map.elems $ foldl f Map.empty rows
+    where f m (Row attributes outcome) = Map.insertWith (++) (attributes !! colNum) [Row (newAttributes attributes) outcome] m
+          newAttributes attributes = removeNth attributes colNum
+
 main = do
-  print $ maximumBy (comparing $ columnEntropy testData) [0.. numAttributes testData - 1]
+  print $ splitTable testData 0
 
 testData = Table [Row ["sunny", "hot", "high", "false"] False,
-       Row ["sunny", "hot", "high", "true"] False,
-       Row ["overcast", "hot", "high", "false"] True,
-       Row ["rain", "mild", "high", "false"] True,
-       Row ["rain", "cool", "normal", "false"] True,
-       Row ["rain", "cool", "normal", "true"] False,
-       Row ["overcast", "cool", "normal", "true"] True,
-       Row ["sunny", "mild", "high", "false"] False,
-       Row ["sunny", "cool", "normal", "false"] True,
-       Row ["rain", "mild", "normal", "false"] True,
-       Row ["sunny", "mild", "normal", "true"] True,
-       Row ["overcast", "mild", "high", "true"] True,
-       Row ["overcast", "hot", "normal", "false"] True,
-       Row ["rain", "mild", "high", "true"] False]
+                  Row ["sunny", "hot", "high", "true"] False,
+                  Row ["overcast", "hot", "high", "false"] True,
+                  Row ["rain", "mild", "high", "false"] True,
+                  Row ["rain", "cool", "normal", "false"] True,
+                  Row ["rain", "cool", "normal", "true"] False,
+                  Row ["overcast", "cool", "normal", "true"] True,
+                  Row ["sunny", "mild", "high", "false"] False,
+                  Row ["sunny", "cool", "normal", "false"] True,
+                  Row ["rain", "mild", "normal", "false"] True,
+                  Row ["sunny", "mild", "normal", "true"] True,
+                  Row ["overcast", "mild", "high", "true"] True,
+                  Row ["overcast", "hot", "normal", "false"] True,
+                  Row ["rain", "mild", "high", "true"] False]
