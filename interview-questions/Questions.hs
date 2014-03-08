@@ -25,6 +25,7 @@ solution1 = map product (powerset [2,3,11])
 --For example given ["tsar", "rat", "tar", "star", "tars", "cheese"] 
 --output [["tsar", "star", "tars"],["rat", "tar"],["cheese"]]
 --the order in the output does not matter.
+--Source: http://sahandsaba.com/interview-question-facebook-anagrams.html
 
 groupEqual :: Ord a => [a] -> [[a]]
 groupEqual list = groupEqualBy id list 
