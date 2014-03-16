@@ -1,8 +1,9 @@
 module Main where
 
 import Data.List
-import qualified Data.Map
+import Data.Map as Map (elems, empty, insertWith) 
 import Control.Monad
+import Debug.Trace
 
 --Question 1 You are given a list of primes. 
 --Output a list of all possible products of them. 
@@ -27,13 +28,46 @@ solution1 = map product (powerset [2,3,11])
 --the order in the output does not matter.
 --Source: http://sahandsaba.com/interview-question-facebook-anagrams.html
 
-groupEqual :: Ord a => [a] -> [[a]]
-groupEqual list = groupEqualBy id list 
+-- | The 'classify' function takes a list and returns a minimum list of lists such
+-- that each sublist in the result contains only equal elements.  For example,
+--
+-- > classify "Mississippi" = ["M","iiii","pp","ssss"]
+--
+-- It is a special case of 'classifyBy', which allows the programmer to supply
+-- their own equality test.
+classify :: Ord a => [a] -> [[a]]
+classify = classifyBy id 
 
-groupEqualBy :: Ord k => (a -> k) -> [a] -> [[a]]
-groupEqualBy hasher = Data.Map.elems . foldl f Data.Map.empty
-	where f m elem = Data.Map.insertWith (++) (hasher elem) [elem] m
+-- | The 'classifyBy' function is the non-overloaded version of 'classify'.
+classifyBy :: Ord k => (a -> k) -> [a] -> [[a]]
+classifyBy hash =  Map.elems . foldl f Map.empty
+	where f m elem = Map.insertWith (++) (hash elem) [elem] m
 
-solution2 = groupEqualBy sort ["tsar", "rat", "tar", "star", "tars", "cheese"]
+solution2 = classifyBy sort ["tsar", "rat", "tar", "star", "tars", "cheese"]
 
-main = print $ groupEqual [1]
+--Question 3 
+--There are 2 non-negative integers: i and j. Given the following equation, 
+--find an (optimal) solution to iterate over i and j in such a way that the output is sorted.
+--2^i * 5^j
+--http://stackoverflow.com/questions/5505894/tricky-google-interview-question
+
+merge :: [Integer] -> [Integer] -> [Integer]
+merge (a:as) (b:bs)   
+  | a < b   = a : merge as (b:bs)
+  | a == b  = a : merge as bs
+  | a > b   = b : merge (a:as) bs
+
+solution3 :: [Integer]
+solution3 = 1 : merge (map (2*) solution3) (map (5*) solution3)
+
+--Question 4
+--FizzBuzz
+--Replace multiples of 3 by Fizz, multiples of 5 by Buzz, multiples of 15 by FizzBuzz
+
+
+fizzBuzz i = if null desc then show i else desc where 
+   desc = concat [label | (j,label) <- tags, i `mod` j == 0]
+   tags = [(3,"Fizz"), (5,"Buzz")]
+
+main=mapM_ putStrLn [max(show x)(concat[n|(f,n)<-[(3,"Fizz"),(5,"Buzz")],mod x f==0])|x<-[1..100]]
+
