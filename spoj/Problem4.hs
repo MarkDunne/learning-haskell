@@ -2,6 +2,9 @@ module Main where
 
 import Control.Monad
 
+--Use Shuting Yard Algorithm described here
+--http://en.wikipedia.org/wiki/Shunting-yard_algorithm
+
 permute :: [a] -> [Int] -> [a]
 permute ls perm = map (ls !!) perm
 
