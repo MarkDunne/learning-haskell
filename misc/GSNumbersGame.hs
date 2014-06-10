@@ -25,7 +25,6 @@ module Main where
             counterVar = counterVar state + 1
         }
 
-    
     data Solution = Solution{
         minFinal :: Double,
         maxFinal :: Double,
